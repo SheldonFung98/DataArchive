@@ -1,0 +1,3 @@
+[submodule "GitArchive"]
+	path = GitArchive
+	url = https://github.com/SheldonFung98/GitArchive.git
