@@ -21,8 +21,19 @@ assert_at_root() {
     fi
 }
 
+init_submodules() {
+    # Initialize git submodules if not already initialized
+    if [ -f "$SCRIPT_PATH/.gitmodules" ]; then
+        if ! git -C "$SCRIPT_PATH" submodule status | grep -qv '^ '; then
+            echo "Initializing git submodules..."
+            git -C "$SCRIPT_PATH" submodule update --init --recursive
+        fi
+    fi
+}
+
 upload() {
     assert_at_root
+    init_submodules
     mkdir -p "$TEMP_DIR"
     if [ ! -f $ARCHIVE_TAR ]; then
         echo "Compressing data..."
@@ -48,6 +59,7 @@ upload() {
 
 download() {
     assert_at_root
+    init_submodules
     echo "Downloading data..."
     mkdir -p $ARCHIVE_CK_PATH
     python3 manage.py --repo $CURRENT_GIT_REPO download --root $ARCHIVE_CK_PATH || {
