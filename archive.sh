@@ -23,10 +23,10 @@ assert_at_root() {
 
 init_submodules() {
     # Initialize git submodules if not already initialized
-    if [ -f "$SCRIPT_PATH/.gitmodules" ]; then
-        if ! git -C "$SCRIPT_PATH" submodule status | grep -qv '^ '; then
+    if [ -f ".gitmodules" ]; then
+        if ! git submodule status | grep -qv '-'; then
             echo "Initializing git submodules..."
-            git -C "$SCRIPT_PATH" submodule update --init --recursive
+            git submodule update --init --recursive
         fi
     fi
 }
