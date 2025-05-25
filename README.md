@@ -22,6 +22,13 @@ DataArchive allows you to store large dataset files using a github repository an
 ```
 3. enjoy!
 
+### Create symlink to data folder
+The [archive script](archive.sh) provides a thoughful function to create symlink at any location.
+```
+./DataArchive/archive.sh link dataset
+```
+This generates `dataset -> /absolute/path/to/DataArchive/data`
+
 ### Tip
 When uploading or downloading from a private repo, your GitHub token is needed. You can alternatively save your token to `github.tk` at repo root to advoid token input:
 ```

@@ -3,7 +3,8 @@
 FILE_SIZE=512M # Size of each chunk (<2GB, restricted by GitHub)
 DATA_DIR="data"
 TEMP_DIR="temp"
-CURRENT_GIT_REPO=$(git remote get-url origin 2>/dev/null | sed -E 's#(git@|https://)([^/:]+)[:/](.+)\.git#\3#')
+SCRIPT_PATH="$(dirname "$(realpath "$0")")"
+CURRENT_GIT_REPO=$(cd $SCRIPT_PATH && git remote get-url origin 2>/dev/null | sed -E 's#(git@|https://)([^/:]+)[:/](.+)\.git#\3#')
 
 ARCHIVE_TAR=$TEMP_DIR/data.tar.gz
 ARCHIVE_CK_PATH=$TEMP_DIR/chunks
@@ -13,7 +14,15 @@ if [ -z "$CURRENT_GIT_REPO" ]; then
     exit 1
 fi
 
+assert_at_root() {
+    if [ "$(pwd)" != "$SCRIPT_PATH" ]; then
+        echo "Error: Please run upload/download command at: $SCRIPT_PATH"
+        exit 1
+    fi
+}
+
 upload() {
+    assert_at_root
     mkdir -p "$TEMP_DIR"
     if [ ! -f $ARCHIVE_TAR ]; then
         echo "Compressing data..."
@@ -38,6 +47,7 @@ upload() {
 }
 
 download() {
+    assert_at_root
     echo "Downloading data..."
     mkdir -p $ARCHIVE_CK_PATH
     python3 manage.py --repo $CURRENT_GIT_REPO download --root $ARCHIVE_CK_PATH || {
@@ -68,8 +78,16 @@ case "$1" in
     download)
         download
         ;;
+    link)
+        if [ -z "$2" ]; then
+            echo "Usage: $0 link <symlink_name>"
+            exit 1
+        fi
+        ln -sfn "$SCRIPT_PATH/$DATA_DIR" "$2"
+        echo "Symlink '$2' created, pointing to '$DATA_DIR'."
+        ;;
     *)
-        echo "Usage: $0 {upload|download}"
+        echo "Usage: $0 {upload|download|link <symlink_name>}"
         exit 1
         ;;
 esac
