@@ -9,10 +9,12 @@ CURRENT_GIT_REPO=$(cd $SCRIPT_PATH && git remote get-url origin 2>/dev/null | se
 ARCHIVE_TAR=$TEMP_DIR/data.tar.gz
 ARCHIVE_CK_PATH=$TEMP_DIR/chunks
 
-if [ -z "$CURRENT_GIT_REPO" ]; then
-    echo "Error: Not a git repository or unable to determine the repository name."
-    exit 1
-fi
+assert_is_repo(){
+    if [ -z "$CURRENT_GIT_REPO" ]; then
+        echo "Error: Not a git repository or unable to determine the repository name."
+        exit 1
+    fi
+}
 
 assert_at_root() {
     if [ "$(pwd)" != "$SCRIPT_PATH" ]; then
@@ -33,6 +35,7 @@ init_submodules() {
 
 upload() {
     assert_at_root
+    assert_is_repo
     init_submodules
     mkdir -p "$TEMP_DIR"
     if [ ! -f $ARCHIVE_TAR ]; then
@@ -59,6 +62,7 @@ upload() {
 
 download() {
     assert_at_root
+    assert_is_repo
     init_submodules
     echo "Downloading data..."
     mkdir -p $ARCHIVE_CK_PATH
